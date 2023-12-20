@@ -104,4 +104,22 @@ public class ImageServiceImplementation implements ImageServiceInterface {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao excluir a imagem pelo ID: " + imageId, e);
         }
     }
+
+    @Override
+    public ImageEntity updateImage(Integer imageId, ImageEntity updatedImage) {
+        Optional<ImageEntity> existingImageOptional = imageRepository.findById(imageId);
+        if (existingImageOptional.isPresent()) {
+            ImageEntity existingImage = existingImageOptional.get();
+
+            // Atualize os campos da imagem com os valores do objeto atualizado
+            existingImage.setImageData(updatedImage.getImageData());
+            // Você pode adicionar mais campos a serem atualizados, se necessário
+
+            // Salve a imagem atualizada no repositório
+            return saveImageToRepository(existingImage);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Imagem não encontrada com o ID: " + imageId);
+        }
+    }
+
 }

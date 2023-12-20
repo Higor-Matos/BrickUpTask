@@ -13,5 +13,6 @@ public interface ImageServiceInterface {
     List<ImageEntity> getImagesByTaskId(Integer taskId);
 
     void deleteImage(Integer imageId);
+    ImageEntity updateImage(Integer imageId, ImageEntity updatedImage);
 
 }

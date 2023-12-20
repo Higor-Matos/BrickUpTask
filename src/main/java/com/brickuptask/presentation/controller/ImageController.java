@@ -1,6 +1,7 @@
 package com.brickuptask.presentation.controller;
 
 import com.brickuptask.domain.dto.CreateImageDTO;
+import com.brickuptask.domain.dto.UpdatedImageDTO;
 import com.brickuptask.domain.dto.ImageDTO;
 import com.brickuptask.domain.entity.ImageEntity;
 import com.brickuptask.domain.response.ApiResponse;
@@ -9,8 +10,10 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,6 +84,32 @@ public class ImageController {
             return ResponseEntity.ok(ApiResponse.success("Imagens encontradas.", imageDTOs));
         } catch (Exception e) {
             return ResponseEntity.ok(ApiResponse.error("Erro ao obter as imagens: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ImageDTO>> updateImage(@PathVariable Integer id, @RequestBody UpdatedImageDTO updatedImageRequest) {
+        logger.info("Recebida uma solicitação para atualizar a imagem com ID: {}", id);
+
+        try {
+            ImageEntity existingImage = imageService.getImageById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Imagem não encontrada com o ID: " + id));
+
+            byte[] updatedImageData = Base64.getDecoder().decode(updatedImageRequest.getImageData());
+
+            existingImage.setImageData(updatedImageData);
+
+            ImageEntity updatedImage = imageService.saveImage(existingImage);
+
+            ImageDTO updatedImageDTO = modelMapper.map(updatedImage, ImageDTO.class);
+            updatedImageDTO.setImageData(Base64.getEncoder().encodeToString(updatedImage.getImageData()));
+
+            logger.info("Imagem atualizada com sucesso.");
+            return ResponseEntity.ok(ApiResponse.success("Imagem atualizada com sucesso.", updatedImageDTO));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getReason()));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error("Erro ao atualizar a imagem: " + e.getMessage()));
         }
     }
 }

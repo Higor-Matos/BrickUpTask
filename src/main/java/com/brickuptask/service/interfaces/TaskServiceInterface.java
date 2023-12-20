@@ -1,4 +1,5 @@
 package com.brickuptask.service.interfaces;
+
 import com.brickuptask.domain.entity.TaskEntity;
 
 import java.util.List;
@@ -13,4 +14,7 @@ public interface TaskServiceInterface {
     TaskEntity updateTaskStatus(Integer taskId, TaskEntity.TaskStatus newStatus);
 
     void deleteTask(Integer taskId);
+
+    TaskEntity updateTaskTitle(Integer taskId, String newTitle);
+    TaskEntity updateTaskDescription(Integer taskId, String newDescription);
 }

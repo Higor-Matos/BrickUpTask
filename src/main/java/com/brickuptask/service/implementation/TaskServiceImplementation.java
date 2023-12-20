@@ -101,6 +101,50 @@ public class TaskServiceImplementation implements TaskServiceInterface {
         }
     }
 
+    @Override
+    public TaskEntity updateTaskTitle(Integer taskId, String newTitle) {
+        logger.info("Tentando atualizar o título da tarefa com ID: {}", taskId);
+
+        try {
+            Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
+            if (optionalTask.isPresent()) {
+                TaskEntity task = optionalTask.get();
+                task.setTitle(newTitle);
+                TaskEntity updatedTask = taskRepository.save(task);
+                logger.info("Título da tarefa atualizado com sucesso.");
+                return updatedTask;
+            } else {
+                logger.warn("Tarefa não encontrada para o ID: {}", taskId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
+            }
+        } catch (Exception e) {
+            handleException("Erro ao atualizar o título da tarefa.", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public TaskEntity updateTaskDescription(Integer taskId, String newDescription) {
+        logger.info("Tentando atualizar a descrição da tarefa com ID: {}", taskId);
+
+        try {
+            Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
+            if (optionalTask.isPresent()) {
+                TaskEntity task = optionalTask.get();
+                task.setDescription(newDescription);
+                TaskEntity updatedTask = taskRepository.save(task);
+                logger.info("Descrição da tarefa atualizada com sucesso.");
+                return updatedTask;
+            } else {
+                logger.warn("Tarefa não encontrada para o ID: {}", taskId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
+            }
+        } catch (Exception e) {
+            handleException("Erro ao atualizar a descrição da tarefa.", e);
+            throw e;
+        }
+    }
+
     private void handleException(String message, Exception e) {
         logger.error(message, e);
     }

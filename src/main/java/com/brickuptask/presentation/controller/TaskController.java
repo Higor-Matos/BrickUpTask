@@ -98,7 +98,6 @@ public class TaskController {
         }
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteTask(@PathVariable Integer id) {
         logger.info("Recebida uma solicitação para excluir uma tarefa pelo ID: {}", id);
@@ -112,4 +111,41 @@ public class TaskController {
             return ResponseEntity.ok(ApiResponse.error("Erro ao excluir a tarefa: " + e.getMessage()));
         }
     }
+
+    @PutMapping("/{id}/title")
+    public ResponseEntity<ApiResponse<TaskDTO>> updateTaskTitle(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO) {
+        logger.info("Recebida uma solicitação para atualizar o título da tarefa pelo ID: {}", id);
+
+        try {
+            TaskEntity updatedTask = taskService.updateTaskTitle(id, updatedTaskDTO.getTitle());
+            TaskDTO updatedTaskResponse = modelMapper.map(updatedTask, TaskDTO.class);
+            logger.info("Título da tarefa atualizado com sucesso.");
+            return ResponseEntity.ok(ApiResponse.success("Título da tarefa atualizado com sucesso.", updatedTaskResponse));
+        } catch (ResponseStatusException e) {
+            logger.warn(TASK_NOT_FOUND_MESSAGE);
+            return ResponseEntity.ok(ApiResponse.error(TASK_NOT_FOUND_MESSAGE));
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar o título da tarefa: {}", e.getMessage());
+            return ResponseEntity.ok(ApiResponse.error("Erro ao atualizar o título da tarefa: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/description")
+    public ResponseEntity<ApiResponse<TaskDTO>> updateTaskDescription(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO) {
+        logger.info("Recebida uma solicitação para atualizar a descrição da tarefa pelo ID: {}", id);
+
+        try {
+            TaskEntity updatedTask = taskService.updateTaskDescription(id, updatedTaskDTO.getDescription());
+            TaskDTO updatedTaskResponse = modelMapper.map(updatedTask, TaskDTO.class);
+            logger.info("Descrição da tarefa atualizada com sucesso.");
+            return ResponseEntity.ok(ApiResponse.success("Descrição da tarefa atualizada com sucesso.", updatedTaskResponse));
+        } catch (ResponseStatusException e) {
+            logger.warn(TASK_NOT_FOUND_MESSAGE);
+            return ResponseEntity.ok(ApiResponse.error(TASK_NOT_FOUND_MESSAGE));
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar a descrição da tarefa: {}", e.getMessage());
+            return ResponseEntity.ok(ApiResponse.error("Erro ao atualizar a descrição da tarefa: " + e.getMessage()));
+        }
+    }
+
 }
