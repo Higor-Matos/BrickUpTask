@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/tasks")
 public class TaskController {
 
+    private static final String TASK_NOT_FOUND_MESSAGE = "Tarefa não encontrada.";
     private final TaskServiceInterface taskService;
     private final ModelMapper modelMapper;
     private final Logger logger = LoggerFactory.getLogger(TaskController.class);
@@ -54,8 +55,8 @@ public class TaskController {
             return taskService.getTaskById(id)
                     .map(task -> ResponseEntity.ok(ApiResponse.success("Tarefa encontrada.", modelMapper.map(task, TaskDTO.class))))
                     .orElseGet(() -> {
-                        logger.info("Tarefa não encontrada.");
-                        return ResponseEntity.ok(ApiResponse.error("Tarefa não encontrada."));
+                        logger.info(TASK_NOT_FOUND_MESSAGE);
+                        return ResponseEntity.ok(ApiResponse.error(TASK_NOT_FOUND_MESSAGE));
                     });
         } catch (Exception e) {
             logger.error("Erro ao obter a tarefa: {}", e.getMessage());
@@ -89,8 +90,8 @@ public class TaskController {
             logger.info("Status da tarefa atualizado com sucesso.");
             return ResponseEntity.ok(ApiResponse.success("Status da tarefa atualizado com sucesso.", updatedTaskResponse));
         } catch (ResponseStatusException e) {
-            logger.warn("Tarefa não encontrada para o ID: {}", id);
-            return ResponseEntity.ok(ApiResponse.error("Tarefa não encontrada."));
+            logger.warn(TASK_NOT_FOUND_MESSAGE);
+            return ResponseEntity.ok(ApiResponse.error(TASK_NOT_FOUND_MESSAGE));
         } catch (Exception e) {
             logger.error("Erro ao atualizar o status da tarefa: {}", e.getMessage());
             return ResponseEntity.ok(ApiResponse.error("Erro ao atualizar o status da tarefa: " + e.getMessage()));

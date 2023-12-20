@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.Base64;
 
 @Service
 public class ImageServiceImplementation implements ImageServiceInterface {
@@ -55,17 +55,6 @@ public class ImageServiceImplementation implements ImageServiceInterface {
                 });
     }
 
-    private byte[] decodeImageData(byte[] imageData) {
-        try {
-            String imageDataString = new String(imageData, StandardCharsets.UTF_8);
-            logger.info("Decodificando os dados da imagem.");
-            return Base64.getDecoder().decode(imageDataString);
-        } catch (IllegalArgumentException e) {
-            logger.error("Erro na decodificação dos dados da imagem.", e);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dados da imagem inválidos.");
-        }
-    }
-
     private ImageEntity saveImageToRepository(ImageEntity image) {
         logger.info("Salvando imagem no repositório.");
         ImageEntity savedImage = imageRepository.save(image);
@@ -83,9 +72,10 @@ public class ImageServiceImplementation implements ImageServiceInterface {
             return image;
         } catch (Exception e) {
             logger.error("Erro ao obter a imagem pelo ID: {}", imageId, e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao obter a imagem pelo ID.", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao obter a imagem pelo ID: " + imageId, e);
         }
     }
+
 
     @Override
     public List<ImageEntity> getImagesByTaskId(Integer taskId) {
@@ -97,9 +87,10 @@ public class ImageServiceImplementation implements ImageServiceInterface {
             return images;
         } catch (Exception e) {
             logger.error("Erro ao obter imagens pela tarefa com ID: {}", taskId, e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao obter imagens pela tarefa com ID.", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao obter imagens pela tarefa com ID: " + taskId, e);
         }
     }
+
 
     @Override
     public void deleteImage(Integer imageId) {
@@ -110,8 +101,7 @@ public class ImageServiceImplementation implements ImageServiceInterface {
             logger.info("Imagem excluída com sucesso.");
         } catch (Exception e) {
             logger.error("Erro ao excluir a imagem pelo ID: {}", imageId, e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao excluir a imagem pelo ID.", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao excluir a imagem pelo ID: " + imageId, e);
         }
     }
-
 }

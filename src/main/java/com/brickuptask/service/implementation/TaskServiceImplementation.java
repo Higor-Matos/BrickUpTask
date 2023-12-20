@@ -36,13 +36,13 @@ public class TaskServiceImplementation implements TaskServiceInterface {
 
     @Override
     public Optional<TaskEntity> getTaskById(Integer taskId) {
-        logger.info("Tentando obter uma tarefa pelo ID: " + taskId);
+        logger.info("Tentando obter uma tarefa pelo ID: {}", taskId);
 
         try {
             Optional<TaskEntity> task = taskRepository.findById(taskId);
 
             if (!task.isPresent()) {
-                logger.warn("Tarefa não encontrada para o ID: " + taskId);
+                logger.warn("Tarefa não encontrada para o ID: {}", taskId);
             }
 
             return task;
@@ -54,7 +54,7 @@ public class TaskServiceImplementation implements TaskServiceInterface {
 
     @Override
     public TaskEntity updateTaskStatus(Integer taskId, TaskEntity.TaskStatus newStatus) {
-        logger.info("Tentando atualizar o status da tarefa com ID: " + taskId);
+        logger.info("Tentando atualizar o status da tarefa com ID: {}", taskId);
 
         try {
             Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
@@ -65,7 +65,7 @@ public class TaskServiceImplementation implements TaskServiceInterface {
                 logger.info("Status da tarefa atualizado com sucesso.");
                 return updatedTask;
             } else {
-                logger.warn("Tarefa não encontrada para o ID: " + taskId);
+                logger.warn("Tarefa não encontrada para o ID: {}", taskId);
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
             }
         } catch (Exception e) {
@@ -73,7 +73,6 @@ public class TaskServiceImplementation implements TaskServiceInterface {
             throw e;
         }
     }
-
 
     @Override
     public List<TaskEntity> getAllTasks() {
@@ -91,7 +90,7 @@ public class TaskServiceImplementation implements TaskServiceInterface {
 
     @Override
     public void deleteTask(Integer taskId) {
-        logger.info("Tentando excluir uma tarefa pelo ID: " + taskId);
+        logger.info("Tentando excluir uma tarefa pelo ID: {}", taskId);
 
         try {
             taskRepository.deleteById(taskId);
@@ -103,6 +102,6 @@ public class TaskServiceImplementation implements TaskServiceInterface {
     }
 
     private void handleException(String message, Exception e) {
-        logger.error(message + " " + e.getMessage(), e);
+        logger.error(message, e);
     }
 }
