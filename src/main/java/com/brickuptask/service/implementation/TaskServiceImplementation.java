@@ -6,7 +6,9 @@ import com.brickuptask.service.interfaces.TaskServiceInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,9 +27,7 @@ public class TaskServiceImplementation implements TaskServiceInterface {
     public TaskEntity saveTask(TaskEntity task) {
         logger.info("Tentando salvar uma tarefa.");
         try {
-            TaskEntity savedTask = taskRepository.save(task);
-            logger.info("Tarefa salva com sucesso.");
-            return savedTask;
+            return taskRepository.save(task);
         } catch (Exception e) {
             handleException("Erro ao salvar a tarefa.", e);
             throw e;
@@ -51,6 +51,29 @@ public class TaskServiceImplementation implements TaskServiceInterface {
             throw e;
         }
     }
+
+    @Override
+    public TaskEntity updateTaskStatus(Integer taskId, TaskEntity.TaskStatus newStatus) {
+        logger.info("Tentando atualizar o status da tarefa com ID: " + taskId);
+
+        try {
+            Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
+            if (optionalTask.isPresent()) {
+                TaskEntity task = optionalTask.get();
+                task.setStatus(newStatus);
+                TaskEntity updatedTask = taskRepository.save(task);
+                logger.info("Status da tarefa atualizado com sucesso.");
+                return updatedTask;
+            } else {
+                logger.warn("Tarefa não encontrada para o ID: " + taskId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
+            }
+        } catch (Exception e) {
+            handleException("Erro ao atualizar o status da tarefa.", e);
+            throw e;
+        }
+    }
+
 
     @Override
     public List<TaskEntity> getAllTasks() {

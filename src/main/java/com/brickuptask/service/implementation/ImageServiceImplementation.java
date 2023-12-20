@@ -36,8 +36,7 @@ public class ImageServiceImplementation implements ImageServiceInterface {
         TaskEntity task = findTask(image.getTask().getTaskId());
         image.setTask(task);
 
-        ImageEntity savedImage = saveImageToRepository(image);
-        return savedImage;
+        return saveImageToRepository(image);
     }
 
     private void validateTaskId(ImageEntity image) {
@@ -76,42 +75,43 @@ public class ImageServiceImplementation implements ImageServiceInterface {
 
     @Override
     public Optional<ImageEntity> getImageById(Integer imageId) {
-        logger.info("Tentando obter uma imagem pelo ID: " + imageId);
+        logger.info("Tentando obter uma imagem pelo ID: {}", imageId);
 
         try {
             Optional<ImageEntity> image = imageRepository.findById(imageId);
             logger.info("Imagem obtida com sucesso.");
             return image;
         } catch (Exception e) {
-            logger.error("Erro ao obter a imagem pelo ID: " + e.getMessage(), e);
-            throw e;
+            logger.error("Erro ao obter a imagem pelo ID: {}", imageId, e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao obter a imagem pelo ID.", e);
         }
     }
 
     @Override
     public List<ImageEntity> getImagesByTaskId(Integer taskId) {
-        logger.info("Tentando obter imagens pela tarefa com ID: " + taskId);
+        logger.info("Tentando obter imagens pela tarefa com ID: {}", taskId);
 
         try {
             List<ImageEntity> images = imageRepository.findByTaskTaskId(taskId);
             logger.info("Imagens obtidas com sucesso.");
             return images;
         } catch (Exception e) {
-            logger.error("Erro ao obter imagens pela tarefa com ID: " + e.getMessage(), e);
-            throw e;
+            logger.error("Erro ao obter imagens pela tarefa com ID: {}", taskId, e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao obter imagens pela tarefa com ID.", e);
         }
     }
 
     @Override
     public void deleteImage(Integer imageId) {
-        logger.info("Tentando excluir uma imagem pelo ID: " + imageId);
+        logger.info("Tentando excluir uma imagem pelo ID: {}", imageId);
 
         try {
             imageRepository.deleteById(imageId);
             logger.info("Imagem excluída com sucesso.");
         } catch (Exception e) {
-            logger.error("Erro ao excluir a imagem pelo ID: " + e.getMessage(), e);
-            throw e;
+            logger.error("Erro ao excluir a imagem pelo ID: {}", imageId, e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao excluir a imagem pelo ID.", e);
         }
     }
+
 }

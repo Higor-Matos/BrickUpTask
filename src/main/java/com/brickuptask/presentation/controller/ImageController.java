@@ -32,7 +32,7 @@ public class ImageController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ImageDTO>> createImage(@RequestBody CreateImageDTO createImageDTO) {
-        logger.info("Recebendo uma solicitação para criar uma nova imagem.");
+        logger.info("Recebida uma solicitação para criar uma nova imagem.");
 
         byte[] imageData = Base64.getDecoder().decode(createImageDTO.getImageData());
         ImageEntity image = modelMapper.map(createImageDTO, ImageEntity.class);
@@ -47,7 +47,7 @@ public class ImageController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ImageDTO>> getImageById(@PathVariable Integer id) {
-        logger.info("Recebendo uma solicitação para obter uma imagem pelo ID: " + id);
+        logger.info("Recebida uma solicitação para obter uma imagem pelo ID: {}", id);
 
         try {
             ImageEntity imageEntity = imageService.getImageById(id).orElse(null);
@@ -66,7 +66,7 @@ public class ImageController {
 
     @GetMapping("/task/{taskId}")
     public ResponseEntity<ApiResponse<List<ImageDTO>>> getImagesByTaskId(@PathVariable Integer taskId) {
-        logger.info("Recebendo uma solicitação para obter imagens pela tarefa ID: " + taskId);
+        logger.info("Recebida uma solicitação para obter imagens pela tarefa ID: {}", taskId);
 
         try {
             List<ImageEntity> images = imageService.getImagesByTaskId(taskId);

@@ -17,8 +17,6 @@ public class ImageEntity {
     @JoinColumn(name = "task_id", nullable = false)
     private TaskEntity task;
 
-    public ImageEntity() {}
-
     public Integer getImageId() {
         return imageId;
     }

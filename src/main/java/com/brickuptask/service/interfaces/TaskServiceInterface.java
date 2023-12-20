@@ -10,6 +10,7 @@ public interface TaskServiceInterface {
     Optional<TaskEntity> getTaskById(Integer taskId);
 
     List<TaskEntity> getAllTasks();
+    TaskEntity updateTaskStatus(Integer taskId, TaskEntity.TaskStatus newStatus);
 
     void deleteTask(Integer taskId);
 }

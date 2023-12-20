@@ -23,7 +23,7 @@ public class TaskEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status = TaskStatus.Pendente;
+    private TaskStatus status = TaskStatus.PENDENTE;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
@@ -70,6 +70,6 @@ public class TaskEntity {
     }
 
     public enum TaskStatus {
-        Pendente, Finalizada
+        PENDENTE, FINALIZADA
     }
 }
