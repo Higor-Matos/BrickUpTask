@@ -12,11 +12,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class TaskServiceImplementation implements TaskServiceInterface {
     private final TaskRepository taskRepository;
     private final Logger logger = LoggerFactory.getLogger(TaskServiceImplementation.class);
+
+    private static final String TASK_NOT_FOUND_MESSAGE = "Tarefa não encontrada";
 
     @Autowired
     public TaskServiceImplementation(TaskRepository taskRepository) {
@@ -53,28 +56,6 @@ public class TaskServiceImplementation implements TaskServiceInterface {
     }
 
     @Override
-    public TaskEntity updateTaskStatus(Integer taskId, TaskEntity.TaskStatus newStatus) {
-        logger.info("Tentando atualizar o status da tarefa com ID: {}", taskId);
-
-        try {
-            Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
-            if (optionalTask.isPresent()) {
-                TaskEntity task = optionalTask.get();
-                task.setStatus(newStatus);
-                TaskEntity updatedTask = taskRepository.save(task);
-                logger.info("Status da tarefa atualizado com sucesso.");
-                return updatedTask;
-            } else {
-                logger.warn("Tarefa não encontrada para o ID: {}", taskId);
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
-            }
-        } catch (Exception e) {
-            handleException("Erro ao atualizar o status da tarefa.", e);
-            throw e;
-        }
-    }
-
-    @Override
     public List<TaskEntity> getAllTasks() {
         logger.info("Tentando obter todas as tarefas.");
 
@@ -101,48 +82,50 @@ public class TaskServiceImplementation implements TaskServiceInterface {
         }
     }
 
-    @Override
-    public TaskEntity updateTaskTitle(Integer taskId, String newTitle) {
-        logger.info("Tentando atualizar o título da tarefa com ID: {}", taskId);
+    // Método genérico para atualizar um campo da tarefa
+    private TaskEntity updateTaskField(Integer taskId, Function<TaskEntity, TaskEntity> updateFunction, String errorMessage) {
+        logger.info("Tentando atualizar o campo da tarefa com ID: {}", taskId);
 
         try {
             Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
             if (optionalTask.isPresent()) {
                 TaskEntity task = optionalTask.get();
-                task.setTitle(newTitle);
-                TaskEntity updatedTask = taskRepository.save(task);
-                logger.info("Título da tarefa atualizado com sucesso.");
-                return updatedTask;
+                TaskEntity updatedTask = updateFunction.apply(task);
+                TaskEntity savedTask = taskRepository.save(updatedTask);
+                logger.info("Campo da tarefa atualizado com sucesso.");
+                return savedTask;
             } else {
                 logger.warn("Tarefa não encontrada para o ID: {}", taskId);
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, TASK_NOT_FOUND_MESSAGE);
             }
         } catch (Exception e) {
-            handleException("Erro ao atualizar o título da tarefa.", e);
+            handleException(errorMessage, e);
             throw e;
         }
     }
 
     @Override
-    public TaskEntity updateTaskDescription(Integer taskId, String newDescription) {
-        logger.info("Tentando atualizar a descrição da tarefa com ID: {}", taskId);
+    public TaskEntity updateTaskTitle(Integer taskId, String newTitle) {
+        return updateTaskField(taskId, task -> {
+            task.setTitle(newTitle);
+            return task;
+        }, "Erro ao atualizar o título da tarefa.");
+    }
 
-        try {
-            Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
-            if (optionalTask.isPresent()) {
-                TaskEntity task = optionalTask.get();
-                task.setDescription(newDescription);
-                TaskEntity updatedTask = taskRepository.save(task);
-                logger.info("Descrição da tarefa atualizada com sucesso.");
-                return updatedTask;
-            } else {
-                logger.warn("Tarefa não encontrada para o ID: {}", taskId);
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
-            }
-        } catch (Exception e) {
-            handleException("Erro ao atualizar a descrição da tarefa.", e);
-            throw e;
-        }
+    @Override
+    public TaskEntity updateTaskDescription(Integer taskId, String newDescription) {
+        return updateTaskField(taskId, task -> {
+            task.setDescription(newDescription);
+            return task;
+        }, "Erro ao atualizar a descrição da tarefa.");
+    }
+
+    @Override
+    public TaskEntity updateTaskStatus(Integer taskId, TaskEntity.TaskStatus newStatus) {
+        return updateTaskField(taskId, task -> {
+            task.setStatus(newStatus);
+            return task;
+        }, "Erro ao atualizar o status da tarefa.");
     }
 
     private void handleException(String message, Exception e) {
