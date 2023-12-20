@@ -1,6 +1,7 @@
 package com.brickuptask.domain.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,10 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "tasks")
 public class TaskEntity {
     private static final Logger logger = LoggerFactory.getLogger(TaskEntity.class);
-
-    public TaskEntity() {
-        logger.debug("Criando uma instância de TaskEntity");
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +25,8 @@ public class TaskEntity {
     @Column(nullable = false)
     private TaskStatus status = TaskStatus.Pendente;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     public Integer getTaskId() {
